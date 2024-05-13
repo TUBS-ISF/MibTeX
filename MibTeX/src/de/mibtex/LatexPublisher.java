@@ -6,6 +6,10 @@
  */
 package de.mibtex;
 
+import de.mibtex.args.ArgParser;
+import de.mibtex.args.NamedArgument;
+import de.mibtex.args.NamelessArgument;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -15,6 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * A class to prepare LaTeX documents for publishing. It removes all generated files and comments.
@@ -28,7 +33,7 @@ public class LatexPublisher {
 	private static class Options {
 		// Set to true if comments starting with %%% should remain in the tex files.
 		boolean allowDocsComments = true;
-		boolean isACM = true;
+		boolean isACM = false;
 		boolean removeShellScripts = true;
 		boolean keepPDFs = true;
 
@@ -97,22 +102,45 @@ public class LatexPublisher {
 	private static Options options;
 	
 	public static void main(String[] args) {
-		if (args.length != 1) {
-			System.err.println("Expected exactly 1 argument: Path to latex project.");
-			return;
-		}
-		
 		options = new Options();
-		
-		/// Adapt options to your project here.
-		/// TODO: Create an argument parser or ini file to parse options.
-		options.allowDocsComments = true;
-		options.isACM = true;
-		options.removeShellScripts = true;
-		options.keepPDFs = true;
-		
+		final AtomicReference<File> inputFile = new AtomicReference<>(null);
+
+		final ArgParser argParser = new ArgParser(
+				new NamelessArgument(
+						"Path to paper directory to clean",
+						filepath -> {
+							inputFile.set(new File(filepath));
+						}
+				),
+				new NamedArgument(
+						"a", "for-acm",
+						"Flag to specify where the files should be cleaned for an ACM publication. They wish to keep the .bbl files.",
+						NamedArgument.Arity.ZERO,
+						false,
+						() -> options.isACM = true,
+						null
+				),
+				new NamedArgument(
+						"s", "keep-shell-scripts",
+						"Keep any shell scripts as well. By default, they are removed.",
+						NamedArgument.Arity.ZERO,
+						false,
+						() -> options.removeShellScripts = false,
+						null
+				),
+				new NamedArgument(
+						"p", "remove-pdfs",
+						"Remove any PDF files as well. By default, they are kept.",
+						NamedArgument.Arity.ZERO,
+						false,
+						() -> options.keepPDFs = false,
+						null
+				)
+		);
+		argParser.parse(args);
+
 		options.apply();
-		processDirectory(new File(args[0]));
+		processDirectory(inputFile.get());
 		
 		System.out.println("\nFinished!");
 	}
