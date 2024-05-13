@@ -55,7 +55,8 @@ public class LatexPublisher {
 				".synctex.gz",
 				".log",
 				".fdb_latexmk",
-				".fls"
+				".fls",
+				".xcp"
 				));
 		
 		public Options() {
