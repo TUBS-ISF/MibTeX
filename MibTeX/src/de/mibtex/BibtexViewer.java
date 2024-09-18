@@ -81,7 +81,7 @@ public class BibtexViewer {
                 BIBTEX_DIR = ini.get("options", "bibtex-dir");
                 MAIN_DIR = ini.get("options", "main-dir");
                 OUTPUT_DIR = MAIN_DIR + ini.get("options", "out-dir-rel");
-                PDF_DIR = MAIN_DIR + ini.get("options", "pdf-dir");
+                PDF_DIR = ini.get("options", "pdf-dir");
                 COMMENTS_DIR = MAIN_DIR + ini.get("options", "comment-dir");
                 PREPRINTS_DIR = ini.get("options", "preprints-dir");
                 COMMENTS_DIR_REL = ini.get("options", "comment-dir-rel");
