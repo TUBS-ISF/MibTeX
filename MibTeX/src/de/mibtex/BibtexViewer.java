@@ -27,8 +27,6 @@ public class BibtexViewer {
 
     public static String BIBTEX_DIR = "";
 
-    public static String MAIN_DIR = "";
-
     public static String OUTPUT_DIR = "";
 
     public static String COMMENTS_DIR_REL = "";
@@ -79,10 +77,9 @@ public class BibtexViewer {
             }
             if (ini != null) {
                 BIBTEX_DIR = ini.get("options", "bibtex-dir");
-                MAIN_DIR = ini.get("options", "main-dir");
-                OUTPUT_DIR = MAIN_DIR + ini.get("options", "out-dir-rel");
+                OUTPUT_DIR = ini.get("options", "out-dir");
                 PDF_DIR = ini.get("options", "pdf-dir");
-                COMMENTS_DIR = MAIN_DIR + ini.get("options", "comment-dir");
+                COMMENTS_DIR = ini.get("options", "comment-dir");
                 PREPRINTS_DIR = ini.get("options", "preprints-dir");
                 COMMENTS_DIR_REL = ini.get("options", "comment-dir-rel");
                 try {
