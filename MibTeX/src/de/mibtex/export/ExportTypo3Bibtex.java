@@ -102,6 +102,7 @@ public class ExportTypo3Bibtex extends Export {
             , when(IS_MASTERSTHESIS, setEntryType(TYPE_THESIS)) // Need for proper display on website
 
             // Custom Links to Preprints
+            , whenKeyIs("BSM+:OOPSLA24", softVarEURLFile("2024-OOPSLA-Bittner"))
             , whenKeyIs("KKS+:SE23", softVarEURLFile("2023-SE-Kuiter-Tseitin"))
             , whenKeyIs("KKK+:SE23", softVarEURLFile("2023-SE-Kuiter-variED"))
             , whenKeyIs("AMK+:GPCE16", softVarEURLFile("2016-GPCE-Al-Hajjaji-Demo"))
