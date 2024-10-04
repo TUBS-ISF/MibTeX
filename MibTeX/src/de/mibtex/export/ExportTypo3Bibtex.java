@@ -162,11 +162,6 @@ public class ExportTypo3Bibtex extends Export {
 
     @Override
     public void writeDocument() {
-        System.err.println(
-                "FIXME: SHN+:SE24 is currently marked as SE paper by a custom rule. " +
-                "It might get renamed in BibTags in the future. " +
-                "In case this happens, the rule might have be removed."
-        );
         // Parse the variables defined in MYabrv.bib
         final Map<String, String> variables = readVariablesFromBibtexFile(new File(BibtexViewer.BIBTEX_DIR, VariablesFile));
 
