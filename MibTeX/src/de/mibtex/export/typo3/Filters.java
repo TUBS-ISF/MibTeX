@@ -107,7 +107,13 @@ public class Filters {
     public final static Predicate<Typo3Entry> BELONGS_TO_FMCOUNTING = hasAtLeastOneTagOf(
             "FMCounting");
 
-    public final static Predicate<Typo3Entry> SHOULD_BE_PUT_ON_WEBSITE = IS_SOFTVARE_PUBLICATION.or(THESIS_BY_SOFTVARE);
+    public final static Predicate<Typo3Entry> SHOULD_BE_PUT_ON_WEBSITE =
+            (IS_SOFTVARE_PUBLICATION.or(THESIS_BY_SOFTVARE)).and(keyIsOneOf(
+                    "splc24benchmark:replication",
+                    "HSO+:VaMoS24-Artifact",
+                    "BKH+:VaMoS24-Artifact",
+                    "BTS+:ESECFSE22:Artifact"
+            ).negate());
 
     public final static Predicate<Typo3Entry> OPARU =
             IS_SOFTVARE_PUBLICATION
