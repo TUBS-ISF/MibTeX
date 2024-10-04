@@ -11,6 +11,7 @@ import de.mibtex.export.typo3.Filters;
 import de.mibtex.export.typo3.Typo3Directory;
 import de.mibtex.export.typo3.Typo3Entry;
 import de.mibtex.export.typo3.Util;
+import org.jbibtex.BibTeXEntry;
 import org.jbibtex.Key;
 
 import java.io.BufferedReader;
@@ -124,6 +125,9 @@ public class ExportTypo3Bibtex extends Export {
 
             // Other custom solutions
             , whenKeyIs("Young21", KEEP_URL_IF_PRESENT)
+            // The number of this entry is OOPSLA2, the only value in this entry that hints at this entry being published at OOPSLA
+            // The number is dropped for Typo3 so we append it to the journal name.
+            , whenKeyIs("BSM+:OOPSLA24", sideffect(t -> t.journal += " " + t.source.entry.getField(BibTeXEntry.KEY_NUMBER).toUserString()))
 
             // Resolving duplicates
             , whenKeyIs("SKH+:SPLC24", MARK_AS_JOURNAL_FIRST)
