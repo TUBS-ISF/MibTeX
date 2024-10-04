@@ -110,6 +110,7 @@ public class Filters {
     public final static Predicate<Typo3Entry> SHOULD_BE_PUT_ON_WEBSITE =
             (IS_SOFTVARE_PUBLICATION.or(THESIS_BY_SOFTVARE)).and(keyIsOneOf(
                     "splc24benchmark:replication",
+                    "splc24benchmark:repository",
                     "HSO+:VaMoS24-Artifact",
                     "BKH+:VaMoS24-Artifact",
                     "BTS+:ESECFSE22:Artifact"
