@@ -77,7 +77,7 @@ public class ExportTypo3Bibtex extends Export {
      * Compose filters with the respective methods of Predicate<T> (such as `and`, `or`).
      */
     private final Predicate<Typo3Entry> bibFilter =
-            Filters.SHOULD_BE_PUT_ON_WEBSITE//.and(Filters.keyIsOneOf("DGT:EMSE21"));
+            Filters.SHOULD_BE_PUT_ON_WEBSITE.and(ignores.negate())
 //            Filters.THESIS_SUPERVISED_BY_SOFTVARE.or(Filters.WITH_PAUL_AT_ICG) // upload to "Abschlussarbeiten"
 //            Filters.THESIS_AUTHORED_BY_SOFTVARE // upload to "Publikationen"
 //            Filters.IS_SOFTVARE_WEBSITE_PAPER.and(Filters.WITH_THOMAS_BEFORE_ULM)
@@ -87,6 +87,18 @@ public class ExportTypo3Bibtex extends Export {
 //			  Filters.keyIsOneOf("TCA:SPLC21")
             ;
 
+    /**
+     * The following publications are excluded during the export,
+     * so they won't appear on our websites.
+     */
+    public final static Predicate<Typo3Entry> ignores = keyIsOneOf(
+            "splc24benchmark:replication",
+            "splc24benchmark:repository",
+            "HSO+:VaMoS24-Artifact",
+            "BKH+:VaMoS24-Artifact",
+            "BTS+:ESECFSE22:Artifact"
+    );
+    
     /**
      * Select the modifiers you want to apply to each entry after filtering.
      * Each modifier is a function taking a Typo3Entry and returning the modified Typo3Entry.
