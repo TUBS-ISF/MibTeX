@@ -126,6 +126,7 @@ public class ExportTypo3Bibtex extends Export {
             , whenKeyIs("Young21", KEEP_URL_IF_PRESENT)
 
             // Resolving duplicates
+            , whenKeyIs("SKH+:SPLC24", MARK_AS_JOURNAL_FIRST)
             , whenKeyIs("RBP+:TR22subsumedbyRBP+:LMCS23", MARK_AS_TECHREPORT)
             , whenKeyIs("SHN+:SE24", MARK_AS_SE_GI_PAPER)
             , whenKeyIs("KKS+:SE23", MARK_AS_SE_GI_PAPER)

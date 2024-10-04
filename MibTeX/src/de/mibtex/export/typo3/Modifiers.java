@@ -36,6 +36,8 @@ public class Modifiers {
             Util.when(t -> t.note.toLowerCase().contains("to appear"), appendToVenue("(To Appear)"));
     public static final Function<Typo3Entry, Typo3Entry> MARK_AS_TECHREPORT =
             Util.whenForced(Filters.IS_TECHREPORT, appendToTitle("(Technical Report)"), "Given entry is not a technical report! (Perhaps an illegal modifier?)");
+    public static final Function<Typo3Entry, Typo3Entry> MARK_AS_JOURNAL_FIRST =
+            appendToTitle("(Journal First)");
     public static final Function<Typo3Entry, Typo3Entry> MARK_AS_EXTENDED_ABSTRACT =
             appendToTitle("(Extended Abstract)");
     public static final Function<Typo3Entry, Typo3Entry> MARK_AS_SE_GI_PAPER =
