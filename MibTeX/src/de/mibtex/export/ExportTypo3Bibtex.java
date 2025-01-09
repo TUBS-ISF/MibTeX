@@ -178,15 +178,23 @@ public class ExportTypo3Bibtex extends Export {
 
     @Override
     public void writeDocument() {
-        // Parse the variables defined in MYabrv.bib
-        final Map<String, String> variables = readVariablesFromBibtexFile(new File(BibtexViewer.BIBTEX_DIR, VariablesFile));
+        System.out.println("=== Parsing BibTeX entries to Typo3 entries ===");
+        System.out.println("  BibTags files have been read from from " + BibtexViewer.BIBTEX_DIR);
 
+        final File variablesFileLocation = new File(BibtexViewer.BIBTEX_DIR, VariablesFile);
+        System.out.println("  Parse variables from " + variablesFileLocation);
+        // Parse the variables defined in MYabrv.bib
+        final Map<String, String> variables = readVariablesFromBibtexFile(variablesFileLocation);
+
+        System.out.println("  Converting entries...");
         // Transform all Bibtex-Entries to Typo3Entries, filter them and apply all modifiers.
         final List<Typo3Entry> typo3Entries = entries.values().stream()
                 .map(b -> new Typo3Entry(b, variables))
                 .filter(bibFilter)
                 .map(ExportTypo3Bibtex::applyModifiers)
                 .collect(Collectors.toList());
+
+        System.out.println("=== DONE ===");
 
         final StringBuilder uploadInstructions = new StringBuilder(System.lineSeparator());
         uploadInstructions.append("To correctly import your entries to Typo3, you should upload:");
