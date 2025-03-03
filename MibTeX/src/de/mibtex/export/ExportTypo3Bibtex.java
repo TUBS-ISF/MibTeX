@@ -142,6 +142,7 @@ public class ExportTypo3Bibtex extends Export {
             , whenKeyIs("BSM+:OOPSLA24", sideffect(t -> t.journal += " " + t.source.entry.getField(BibTeXEntry.KEY_NUMBER).toUserString()))
 
             // Resolving duplicates
+            , whenKeyIs("PKTS:TR24subsumedbyPKTS:SPLC24", MARK_AS_TECHREPORT)
             , whenKeyIs("SKH+:SPLC24", MARK_AS_JOURNAL_FIRST)
             , whenKeyIs("RBP+:TR22subsumedbyRBP+:LMCS23", MARK_AS_TECHREPORT)
             , whenKeyIs("SHN+:SE24", MARK_AS_SE_GI_PAPER)
