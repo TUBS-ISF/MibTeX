@@ -85,6 +85,10 @@ public class ExportTypo3Bibtex extends Export {
 //			  Filters.BELONGS_TO_SOFTVARE
 //            Filters.BELONGS_TO_OBDDIMAL
 //			  Filters.keyIsOneOf("TCA:SPLC21")
+        // This is the filter used for the OPARU export (see: https://spgit.informatik.uni-ulm.de/softvare-group/org/-/issues/13).
+        //IS_SOFTVARE_PUBLICATION
+        //  .and(t -> t.year == 2024) // choose year here
+        //  .and(IS_TECHREPORT.negate())
             ;
 
     /**
