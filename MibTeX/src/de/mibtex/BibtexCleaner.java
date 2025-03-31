@@ -46,6 +46,14 @@ public class BibtexCleaner {
 						attributesToRemove::removeAll 
 				),
 				new NamedArgument(
+						"d", "delete-attributes",
+						"Followed by a space-separated list of bibtex attribute names. These attributes will be removed upon cleaning in addition to the default ones (" + DEFAULT_ATTRIBUTES_TO_REMOVE + ").",
+						NamedArgument.Arity.ANY,
+						false,
+						null,
+						attributesToRemove::addAll
+				),
+				new NamedArgument(
 						"o", "out",
 						"Explicitly specify the output file. If omitted, a suitable name will be generated, starting with 'literature-cleaned'.",
 						NamedArgument.Arity.ONE,
