@@ -17,7 +17,6 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class BibtexCleaner {
 	private static final List<String> DEFAULT_ATTRIBUTES_TO_REMOVE = List.of(
-			"doi",
 			"issn",
 			"isbn",
 			"url",
