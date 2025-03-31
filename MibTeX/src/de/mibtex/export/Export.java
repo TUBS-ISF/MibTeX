@@ -53,9 +53,6 @@ public abstract class Export {
             };
             BibTeXDatabase database = parser.parse(reader);
             extractEntries(database);
-        } catch (FileNotFoundException e) {
-            System.out.println("BibTeX-File not found under " + path + file);
-            System.exit(0);
         } catch (IOException e) {
             System.out.println("BibTeXParser has an IOExeption");
             System.exit(0);
