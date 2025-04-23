@@ -6,6 +6,7 @@
  */
 package de.mibtex;
 
+import de.mibtex.citationservice.CitationService;
 import de.mibtex.export.*;
 import org.ini4j.Ini;
 import org.ini4j.Wini;
@@ -42,9 +43,11 @@ public class BibtexViewer {
 
     public static List<String> TAGS = new ArrayList<String>();
 
+    public static List<String> FILTERTAGS = new ArrayList<String>();
+
     private static boolean cleanOutputDir;
 
-    private static boolean updateCitations;
+    private static boolean citationServiceActive;
 
     private static String format = "HTML";
 
@@ -101,10 +104,20 @@ public class BibtexViewer {
                     COMMENTS_DIR = MAIN_DIR + ini.get("options", "comment-dir");
                     PREPRINTS_DIR = ini.get("options", "preprints-dir");
                     COMMENTS_DIR_REL = ini.get("options", "comment-dir-rel");
-                    String[] tagArray = ini.get("options", "tags").split(",");
-                    TAGS.addAll(Arrays.asList(tagArray));
-                    cleanOutputDir = ini.get("options", "clean", Boolean.class);
-                    updateCitations = ini.get("options", "citationService", Boolean.class);
+                    try {
+                    	String[] tagArray = ini.get("options", "tags").split(",");
+                    	TAGS.addAll(Arrays.asList(tagArray));
+                    } catch (Exception e) {}
+                    try {
+	                    String[] filterTagArray = ini.get("options", "filter-tags").split(",");
+	                    FILTERTAGS.addAll(Arrays.asList(filterTagArray));
+                    } catch (Exception e) {}
+                    try {
+                    	cleanOutputDir = ini.get("options", "clean", Boolean.class);
+                    } catch (Exception e) {}
+                    try {
+                    	citationServiceActive = ini.get("options", "citation-service", Boolean.class);
+                    } catch (Exception e) {}
                     String citationDir = ini.get("options", "citation-dir");
                     if (citationDir == null || citationDir.isEmpty()) {
                         CITATION_DIR = BIBTEX_DIR;
@@ -137,11 +150,11 @@ public class BibtexViewer {
                 cleanOutputDir = false;
             }
             try {
-                updateCitations = Boolean.getBoolean(args[8]);
+                citationServiceActive = Boolean.getBoolean(args[8]);
             } catch (Exception e) {
                 System.out
                         .println("Citations are going to be updated");
-                updateCitations = true;
+                citationServiceActive = true;
             }
             try {
                 CITATION_DIR = args[9];
@@ -158,11 +171,12 @@ public class BibtexViewer {
             }
         }
         try {
-            if (updateCitations && !"Citations".equals(format)) {
+            if (citationServiceActive && !"Citations".equalsIgnoreCase(format)) {
                 new BibtexViewer("Citations");
             }
-            if (format != null)
+            else if (format != null) {
                 new BibtexViewer(format);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -189,7 +203,7 @@ public class BibtexViewer {
             case "SAMPLING":
                 exporter = new ExportSampling(BibtexViewer.BIBTEX_DIR, "literature.bib");
                 break;
-            case "SAMPLING LATEX":
+            case "SAMPLING_LATEX":
                 exporter = new ExportSamplingLatex(BibtexViewer.BIBTEX_DIR, "literature.bib");
                 break;
             case "HTML_NEW":
@@ -208,8 +222,11 @@ public class BibtexViewer {
         if (cleanOutputDir) {
             Export.cleanOutputFolder();
         }
-        // exporter.printMissingPDFs();
-        // exporter.renameFiles();
         exporter.writeDocument();
+        Export.renameFiles(false);
+        Export.renameFiles(true);
+        if (citationServiceActive) {
+            CitationService.main(new String[] {BibtexViewer.CITATION_DIR});
+        }
     }
 }

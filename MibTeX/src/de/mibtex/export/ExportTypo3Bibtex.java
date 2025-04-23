@@ -6,13 +6,28 @@
  */
 package de.mibtex.export;
 
-import de.mibtex.BibtexViewer;
-import de.mibtex.export.typo3.Filters;
-import de.mibtex.export.typo3.Typo3Directory;
-import de.mibtex.export.typo3.Typo3Entry;
-import de.mibtex.export.typo3.Util;
-import org.jbibtex.BibTeXEntry;
-import org.jbibtex.Key;
+import static de.mibtex.export.typo3.Filters.BELONGS_TO_VARIANTSYNC_PUBLICATIONS;
+import static de.mibtex.export.typo3.Filters.BELONGS_TO_VARIANTSYNC_THESES;
+import static de.mibtex.export.typo3.Filters.IS_MASTERSTHESIS;
+import static de.mibtex.export.typo3.Filters.keyIsOneOf;
+import static de.mibtex.export.typo3.Modifiers.ADD_PAPER_LINK_IF_SOFTVARE;
+import static de.mibtex.export.typo3.Modifiers.CLEAR_URL;
+import static de.mibtex.export.typo3.Modifiers.KEEP_URL_IF_PRESENT;
+import static de.mibtex.export.typo3.Modifiers.MARK_AS_EXTENDED_ABSTRACT;
+import static de.mibtex.export.typo3.Modifiers.MARK_AS_JOURNAL_FIRST;
+import static de.mibtex.export.typo3.Modifiers.MARK_AS_PHDTHESIS;
+import static de.mibtex.export.typo3.Modifiers.MARK_AS_PROJECTTHESIS;
+import static de.mibtex.export.typo3.Modifiers.MARK_AS_SE_GI_PAPER;
+import static de.mibtex.export.typo3.Modifiers.MARK_AS_TECHREPORT;
+import static de.mibtex.export.typo3.Modifiers.MARK_IF_TO_APPEAR;
+import static de.mibtex.export.typo3.Modifiers.TAG_IF_SOFTVARE;
+import static de.mibtex.export.typo3.Modifiers.TAG_IF_THOMAS_IS_EDITOR;
+import static de.mibtex.export.typo3.Modifiers.appendToTitle;
+import static de.mibtex.export.typo3.Modifiers.setEntryType;
+import static de.mibtex.export.typo3.Modifiers.sideffect;
+import static de.mibtex.export.typo3.Modifiers.softVarEURLFile;
+import static de.mibtex.export.typo3.Modifiers.whenKeyIs;
+import static de.mibtex.export.typo3.Util.when;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -26,9 +41,14 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static de.mibtex.export.typo3.Filters.*;
-import static de.mibtex.export.typo3.Modifiers.*;
-import static de.mibtex.export.typo3.Util.when;
+import org.jbibtex.BibTeXEntry;
+import org.jbibtex.Key;
+
+import de.mibtex.BibtexViewer;
+import de.mibtex.export.typo3.Filters;
+import de.mibtex.export.typo3.Typo3Directory;
+import de.mibtex.export.typo3.Typo3Entry;
+import de.mibtex.export.typo3.Util;
 
 /**
  * Exports the bibtex file to bibtex in a carefully adjusted format such that the BibTex-Importer of Typo3 (Website-Framework) can read it correctly.

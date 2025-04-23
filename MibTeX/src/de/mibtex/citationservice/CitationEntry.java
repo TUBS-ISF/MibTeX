@@ -114,7 +114,7 @@ public class CitationEntry implements Comparable<CitationEntry> {
     public String getCSVString() {
         StringBuilder out = new StringBuilder();
         out.append("\"" + getKey() + "\";");
-        out.append("\"" + getTitle() + "\";");
+        out.append("\"" + getTitle().replace(';', ':') + "\";");
         out.append(getCitations() + ";");
         out.append(getLastUpdate() + ";");
         out.append(System.getProperty("line.separator"));

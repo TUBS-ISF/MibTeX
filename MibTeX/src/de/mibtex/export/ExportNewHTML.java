@@ -7,7 +7,11 @@
 package de.mibtex.export;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import de.mibtex.BibtexEntry;
 import de.mibtex.BibtexViewer;
@@ -38,6 +42,15 @@ public class ExportNewHTML extends Export {
         Set<String> tags = new HashSet<>();
         Set<Integer> years = new HashSet<>();
         for (BibtexEntry entry : entries.values()) {
+        	boolean containsFilterTag = true; // if there are no filter tags, do not skip anything
+        	for (String filterTag : BibtexViewer.FILTERTAGS) {
+        		containsFilterTag = entry.tagList.containsKey(filterTag);
+        		if (containsFilterTag)
+        			break;
+        	}
+    		if (!containsFilterTag)
+    			continue;
+    		
             HTML.append("<tr id=\"").append(entry.key).append("\">")
                     .append("<td>").append(generateAuthorLinks(entry)).append("</td>")
                     .append("<td>").append(generateTitleLink(entry)).append("</td>")
