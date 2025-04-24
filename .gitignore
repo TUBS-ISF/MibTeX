@@ -10,3 +10,6 @@
 /MibTeX/.settings/
 /MibTeX/.classpath
 /MibTeX/.project
+
+# ignore emacs files
+.projectile
