@@ -5,5 +5,5 @@ jar := target/MibTeX-$(version)-SNAPSHOT.jar
 build:
 	mvn package
 
-run-typo3-export:
+run-typo3-export: build
 	java -jar ${jar} ../config/typo3.ini
