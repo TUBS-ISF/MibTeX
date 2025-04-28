@@ -54,7 +54,8 @@ public abstract class Export {
             BibTeXDatabase database = parser.parse(reader);
             extractEntries(database);
         } catch (IOException e) {
-            System.out.println("BibTeXParser has an IOExeption");
+            System.err.println("BibTeXParser has an IOExeption");
+            System.err.println(e);
             System.exit(0);
         } catch (ParseException e) {
             System.out.println("BibTeX-File cannot be parsed");
