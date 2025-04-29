@@ -10,3 +10,6 @@ build:
 
 run-typo3-export: build
 	java -jar ${jar} ../config/typo3.ini
+
+run-html-export: build
+	java -jar ${jar} ../config/html.ini
