@@ -54,22 +54,7 @@ public class BibtexViewer {
     public static String CITATION_DIR;
 
     /**
-     * Example arguments
-     * <p>
-     * BibtexViewer "C:\\Users\\tthuem\\workspace4.2.1\\tthuem-Bibtex\\"
-     * "C:\\Users\\tthuem\\Dropbox\\Literatur\\" "HTML\\" "..\\Library\\"
-     * "Library\\" "tt-tags" "CSV/JSON/HTML/Classification" "true" "C:\\Users\\tthuem\\workspace4.2.1\\tthuem-Bibtex\\"
-     *
-     * @param args array containing:
-     *             - path to Bibtex file path to main directory
-     *             - relative path of the HTML to main directory
-     *             - relative path of PDF files to the HTML folder (for linking files in HTML)
-     *             - relative path of PDF files to main directory
-     *             - list of the tag containing your keywords (format: "tag1,tag2,tag3")
-     *             - format for export (CSV/JSON/HTML)
-     *             - boolean for output cleaning (default: false)
-     *             - boolean for update citations file (default:true)
-     *             - path to citations file (default: Bibtex file path)
+     * @param args array containing path to ini file
      */
     public static void main(String[] args) {
         if (args.length <= 1) {
@@ -132,44 +117,8 @@ public class BibtexViewer {
             } else {
                 System.out.println("Options file not found under: " + iniFile.getName());
             }
-        } else {
-            // TODO: Does not support "preprints-dir" should this be deprecated?
-            BIBTEX_DIR = args[0];
-            MAIN_DIR = args[1];
-            OUTPUT_DIR = MAIN_DIR + args[2];
-            PDF_DIR_REL = args[3];
-            PDF_DIR = MAIN_DIR + args[4];
-            String[] tagArray = args[5].split(",");
-            Collections.addAll(TAGS, tagArray);
-
-            try {
-                cleanOutputDir = Boolean.getBoolean(args[7]);
-            } catch (Exception e) {
-                System.out
-                        .println("Output will not be cleaned");
-                cleanOutputDir = false;
-            }
-            try {
-                citationServiceActive = Boolean.getBoolean(args[8]);
-            } catch (Exception e) {
-                System.out
-                        .println("Citations are going to be updated");
-                citationServiceActive = true;
-            }
-            try {
-                CITATION_DIR = args[9];
-            } catch (Exception e) {
-                System.out
-                        .println("Citation is saved in Bibtex directory");
-                CITATION_DIR = BIBTEX_DIR;
-            }
-            try {
-                format = args[6];
-            } catch (Exception e) {
-                System.out
-                        .println("Exportformat Parameter not recognized. Setting Exportformat to HTML");
-            }
         }
+
         try {
             if (citationServiceActive && !"Citations".equalsIgnoreCase(format)) {
                 new BibtexViewer("Citations");

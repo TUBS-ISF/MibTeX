@@ -46,13 +46,3 @@ out-format=HTML_NEW
 
 Run MibTeX like this:
 `java.exe -cp bin;lib/* "de.mibtex.BibtexViewer" "C:\\Users\\tthuem\\Tools\\example.ini"`
-
-### Option 2: Command-Line Parameters
-0. Directory of your BibTeX repository ("D:/Literatur/BibTags/")
-1. The output directory ("D:/Literatur/")
-2. Relative path inside the output directory where the page should be generated ("")
-3. Relative directory to pdfs ("PDF/")?
-4. Relative path inside the output directory where your pdfs are stored ("PDF/")
-5. List of tags ("tt-tags" or "keywords" referring to the entry that contains your tags)
-6. Target format: If you just want to generate the html page use "HTML_NEW".
-7. "true" if the output directory should be cleaned before build, "false" else
