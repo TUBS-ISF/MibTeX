@@ -64,6 +64,9 @@ out-format=HTML_NEW
 ### Running MibTeX via Make
 
 All the above commands are documented in our `Makefile` which resides right next to the `pom.xml` for Maven.
-* To build run: `make build`
 * To clean the build files run: `make clean`
-* To run the Typo3 export: `make run-typo3-export`. This will fail in case you do not have a respective config file in `config/typo3.ini`. If your config is another directory, run MibTeX manually with it (see above) or adapt the Makefile (but do not commit those changes!).
+* To build run: `make build`
+
+The makefile contains a few default targets to run MibTeX. These goals assume that a respective ini file exists in the `config` directory. If you do not have a config there, oryour config is in another directory, consider running MibTeX manually (see above) or to adapt the Makefile (but do not commit those changes!).
+* To run the HTML export: `make run-html-export`.
+* To run the Typo3 export: `make run-typo3-export`.
