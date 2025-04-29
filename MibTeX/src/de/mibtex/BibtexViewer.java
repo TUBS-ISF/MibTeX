@@ -6,6 +6,7 @@
  */
 package de.mibtex;
 
+import de.mibtex.citationservice.CitationService;
 import de.mibtex.export.*;
 import org.ini4j.Ini;
 import org.ini4j.Wini;
@@ -42,127 +43,87 @@ public class BibtexViewer {
 
     public static List<String> TAGS = new ArrayList<String>();
 
+    public static List<String> FILTERTAGS = new ArrayList<String>();
+
     private static boolean cleanOutputDir;
 
-    private static boolean updateCitations;
+    private static boolean citationServiceActive;
 
     private static String format = "HTML";
 
     public static String CITATION_DIR;
 
     /**
-     * Example arguments
-     * <p>
-     * BibtexViewer "C:\\Users\\tthuem\\workspace4.2.1\\tthuem-Bibtex\\"
-     * "C:\\Users\\tthuem\\Dropbox\\Literatur\\" "HTML\\" "..\\Library\\"
-     * "Library\\" "tt-tags" "CSV/JSON/HTML/Classification" "true" "C:\\Users\\tthuem\\workspace4.2.1\\tthuem-Bibtex\\"
-     *
-     * @param args array containing:
-     *             - path to Bibtex file path to main directory
-     *             - relative path of the HTML to main directory
-     *             - relative path of PDF files to the HTML folder (for linking files in HTML)
-     *             - relative path of PDF files to main directory
-     *             - list of the tag containing your keywords (format: "tag1,tag2,tag3")
-     *             - format for export (CSV/JSON/HTML)
-     *             - boolean for output cleaning (default: false)
-     *             - boolean for update citations file (default:true)
-     *             - path to citations file (default: Bibtex file path)
+     * @param args array containing path to ini file
      */
     public static void main(String[] args) {
-        if (args.length <= 1) {
-            String configurationFile;
-            if (args.length == 0)
-                configurationFile = "options.ini";
-            else {
-                configurationFile = args[0];
-            }
-            File iniFile = new File(configurationFile);
-            if (iniFile.exists()) {
-                Ini ini = null;
-                if (System.getProperty("os.name").contains("Windows")) {
-                    try {
-                        ini = new Wini(iniFile);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    try {
-                        ini = new Ini(iniFile);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                if (ini != null) {
-                    BIBTEX_DIR = ini.get("options", "bibtex-dir");
-                    MAIN_DIR = ini.get("options", "main-dir");
-                    OUTPUT_DIR = MAIN_DIR + ini.get("options", "out-dir-rel");
-                    PDF_DIR = MAIN_DIR + ini.get("options", "pdf-dir");
-                    PDF_DIR_REL = ini.get("options", "pdf-dir-rel");
-                    COMMENTS_DIR = MAIN_DIR + ini.get("options", "comment-dir");
-                    PREPRINTS_DIR = ini.get("options", "preprints-dir");
-                    COMMENTS_DIR_REL = ini.get("options", "comment-dir-rel");
-                    String[] tagArray = ini.get("options", "tags").split(",");
-                    TAGS.addAll(Arrays.asList(tagArray));
-                    cleanOutputDir = ini.get("options", "clean", Boolean.class);
-                    updateCitations = ini.get("options", "citationService", Boolean.class);
-                    String citationDir = ini.get("options", "citation-dir");
-                    if (citationDir == null || citationDir.isEmpty()) {
-                        CITATION_DIR = BIBTEX_DIR;
-                    } else {
-                        CITATION_DIR = citationDir;
-                    }
-                    format = ini.get("options", "out-format");
-                } else {
-                    System.out.println("Ini file reader is null!");
-                    System.exit(0);
+        String configurationFile;
+        if (args.length == 0)
+            configurationFile = "options.ini";
+        else {
+            configurationFile = args[0];
+        }
+        File iniFile = new File(configurationFile);
+        if (iniFile.exists()) {
+            Ini ini = null;
+            if (System.getProperty("os.name").contains("Windows")) {
+                try {
+                    ini = new Wini(iniFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             } else {
-                System.out.println("Options file not found under: " + iniFile.getName());
+                try {
+                    ini = new Ini(iniFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (ini != null) {
+                BIBTEX_DIR = ini.get("options", "bibtex-dir");
+                MAIN_DIR = ini.get("options", "main-dir");
+                OUTPUT_DIR = MAIN_DIR + ini.get("options", "out-dir-rel");
+                PDF_DIR = MAIN_DIR + ini.get("options", "pdf-dir");
+                PDF_DIR_REL = ini.get("options", "pdf-dir-rel");
+                COMMENTS_DIR = MAIN_DIR + ini.get("options", "comment-dir");
+                PREPRINTS_DIR = ini.get("options", "preprints-dir");
+                COMMENTS_DIR_REL = ini.get("options", "comment-dir-rel");
+                try {
+                	String[] tagArray = ini.get("options", "tags").split(",");
+                	TAGS.addAll(Arrays.asList(tagArray));
+                } catch (Exception e) {}
+                try {
+	                String[] filterTagArray = ini.get("options", "filter-tags").split(",");
+	                FILTERTAGS.addAll(Arrays.asList(filterTagArray));
+                } catch (Exception e) {}
+                try {
+                	cleanOutputDir = ini.get("options", "clean", Boolean.class);
+                } catch (Exception e) {}
+                try {
+                	citationServiceActive = ini.get("options", "citation-service", Boolean.class);
+                } catch (Exception e) {}
+                String citationDir = ini.get("options", "citation-dir");
+                if (citationDir == null || citationDir.isEmpty()) {
+                    CITATION_DIR = BIBTEX_DIR;
+                } else {
+                    CITATION_DIR = citationDir;
+                }
+                format = ini.get("options", "out-format");
+            } else {
+                System.out.println("Ini file reader is null!");
+                System.exit(0);
             }
         } else {
-            // TODO: Does not support "preprints-dir" should this be deprecated?
-            BIBTEX_DIR = args[0];
-            MAIN_DIR = args[1];
-            OUTPUT_DIR = MAIN_DIR + args[2];
-            PDF_DIR_REL = args[3];
-            PDF_DIR = MAIN_DIR + args[4];
-            String[] tagArray = args[5].split(",");
-            Collections.addAll(TAGS, tagArray);
-
-            try {
-                cleanOutputDir = Boolean.getBoolean(args[7]);
-            } catch (Exception e) {
-                System.out
-                        .println("Output will not be cleaned");
-                cleanOutputDir = false;
-            }
-            try {
-                updateCitations = Boolean.getBoolean(args[8]);
-            } catch (Exception e) {
-                System.out
-                        .println("Citations are going to be updated");
-                updateCitations = true;
-            }
-            try {
-                CITATION_DIR = args[9];
-            } catch (Exception e) {
-                System.out
-                        .println("Citation is saved in Bibtex directory");
-                CITATION_DIR = BIBTEX_DIR;
-            }
-            try {
-                format = args[6];
-            } catch (Exception e) {
-                System.out
-                        .println("Exportformat Parameter not recognized. Setting Exportformat to HTML");
-            }
+            System.out.println("Options file not found under: " + iniFile.getName());
         }
+
         try {
-            if (updateCitations && !"Citations".equals(format)) {
+            if (citationServiceActive && !"Citations".equalsIgnoreCase(format)) {
                 new BibtexViewer("Citations");
             }
-            if (format != null)
+            else if (format != null) {
                 new BibtexViewer(format);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -189,7 +150,7 @@ public class BibtexViewer {
             case "SAMPLING":
                 exporter = new ExportSampling(BibtexViewer.BIBTEX_DIR, "literature.bib");
                 break;
-            case "SAMPLING LATEX":
+            case "SAMPLING_LATEX":
                 exporter = new ExportSamplingLatex(BibtexViewer.BIBTEX_DIR, "literature.bib");
                 break;
             case "HTML_NEW":
@@ -208,8 +169,11 @@ public class BibtexViewer {
         if (cleanOutputDir) {
             Export.cleanOutputFolder();
         }
-        // exporter.printMissingPDFs();
-        // exporter.renameFiles();
         exporter.writeDocument();
+        Export.renameFiles(false);
+        Export.renameFiles(true);
+        if (citationServiceActive) {
+            CitationService.main(new String[] {BibtexViewer.CITATION_DIR});
+        }
     }
 }

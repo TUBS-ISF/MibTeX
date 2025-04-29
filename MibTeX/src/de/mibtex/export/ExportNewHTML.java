@@ -10,6 +10,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import de.mibtex.BibtexEntry;
@@ -22,19 +23,34 @@ import de.mibtex.export.typo3.Typo3Entry;
  * @author Christopher Sontag
  */
 public class ExportNewHTML extends Export {
-
+    private Map<String, String> bibTagsVariables;
+    
     public ExportNewHTML(String path, String file) throws Exception {
         super(path, file);
     }
 
     @Override
     public void writeDocument() {
+        bibTagsVariables = ExportTypo3Bibtex.readVariablesFromBibtexFile(new File(
+                BibtexViewer.BIBTEX_DIR,
+                ExportTypo3Bibtex.VariablesFile
+        ));
+        
         String input = readFromFile("resources/", new File("index_in.html"));
         StringBuilder HTML = new StringBuilder();
         Set<String> venues = new HashSet<>();
         Set<String> tags = new HashSet<>();
         Set<Integer> years = new HashSet<>();
         for (BibtexEntry entry : entries.values()) {
+        	boolean containsFilterTag = true; // if there are no filter tags, do not skip anything
+        	for (String filterTag : BibtexViewer.FILTERTAGS) {
+        		containsFilterTag = entry.tagList.containsKey(filterTag);
+        		if (containsFilterTag)
+        			break;
+        	}
+    		if (!containsFilterTag)
+    			continue;
+    		
             HTML.append("<tr id=\"").append(entry.key).append("\">")
                     .append("<td>").append(generateAuthorLinks(entry)).append("</td>")
                     .append("<td>").append(generateTitleLink(entry)).append("</td>")
@@ -106,13 +122,7 @@ public class ExportNewHTML extends Export {
 
     private String generateTagLinks(BibtexEntry entry) {
         final Typo3Entry entryAsT3 = ExportTypo3Bibtex.applyModifiers(
-                new Typo3Entry(
-                        entry,
-                        ExportTypo3Bibtex.readVariablesFromBibtexFile(new File(
-                                BibtexViewer.BIBTEX_DIR,
-                                ExportTypo3Bibtex.VariablesFile
-                        ))
-                )
+                new Typo3Entry(entry, bibTagsVariables)
         );
 
         StringBuilder html = new StringBuilder();
@@ -139,7 +149,7 @@ public class ExportNewHTML extends Export {
 			html.append(entry.url);
 			html.append("\">url</a>, ");
 		}
-        // Typo3 URL
+        // Typo3 URL for preprints
         final boolean hasT3URL = !entryAsT3.url.isBlank();
         if (hasT3URL && !(hasURL && entry.url.equals(entryAsT3.url))) {
             html.append("<a href=\"");

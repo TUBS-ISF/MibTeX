@@ -6,12 +6,28 @@
  */
 package de.mibtex.export;
 
-import de.mibtex.BibtexViewer;
-import de.mibtex.export.typo3.Filters;
-import de.mibtex.export.typo3.Typo3Directory;
-import de.mibtex.export.typo3.Typo3Entry;
-import de.mibtex.export.typo3.Util;
-import org.jbibtex.Key;
+import static de.mibtex.export.typo3.Filters.BELONGS_TO_VARIANTSYNC_PUBLICATIONS;
+import static de.mibtex.export.typo3.Filters.BELONGS_TO_VARIANTSYNC_THESES;
+import static de.mibtex.export.typo3.Filters.IS_MASTERSTHESIS;
+import static de.mibtex.export.typo3.Filters.keyIsOneOf;
+import static de.mibtex.export.typo3.Modifiers.ADD_PAPER_LINK_IF_SOFTVARE;
+import static de.mibtex.export.typo3.Modifiers.CLEAR_URL;
+import static de.mibtex.export.typo3.Modifiers.KEEP_URL_IF_PRESENT;
+import static de.mibtex.export.typo3.Modifiers.MARK_AS_EXTENDED_ABSTRACT;
+import static de.mibtex.export.typo3.Modifiers.MARK_AS_JOURNAL_FIRST;
+import static de.mibtex.export.typo3.Modifiers.MARK_AS_PHDTHESIS;
+import static de.mibtex.export.typo3.Modifiers.MARK_AS_PROJECTTHESIS;
+import static de.mibtex.export.typo3.Modifiers.MARK_AS_SE_GI_PAPER;
+import static de.mibtex.export.typo3.Modifiers.MARK_AS_TECHREPORT;
+import static de.mibtex.export.typo3.Modifiers.MARK_IF_TO_APPEAR;
+import static de.mibtex.export.typo3.Modifiers.TAG_IF_SOFTVARE;
+import static de.mibtex.export.typo3.Modifiers.TAG_IF_THOMAS_IS_EDITOR;
+import static de.mibtex.export.typo3.Modifiers.appendToTitle;
+import static de.mibtex.export.typo3.Modifiers.setEntryType;
+import static de.mibtex.export.typo3.Modifiers.sideffect;
+import static de.mibtex.export.typo3.Modifiers.softVarEURLFile;
+import static de.mibtex.export.typo3.Modifiers.whenKeyIs;
+import static de.mibtex.export.typo3.Util.when;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,9 +41,14 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static de.mibtex.export.typo3.Filters.*;
-import static de.mibtex.export.typo3.Modifiers.*;
-import static de.mibtex.export.typo3.Util.when;
+import org.jbibtex.BibTeXEntry;
+import org.jbibtex.Key;
+
+import de.mibtex.BibtexViewer;
+import de.mibtex.export.typo3.Filters;
+import de.mibtex.export.typo3.Typo3Directory;
+import de.mibtex.export.typo3.Typo3Entry;
+import de.mibtex.export.typo3.Util;
 
 /**
  * Exports the bibtex file to bibtex in a carefully adjusted format such that the BibTex-Importer of Typo3 (Website-Framework) can read it correctly.
@@ -76,7 +97,7 @@ public class ExportTypo3Bibtex extends Export {
      * Compose filters with the respective methods of Predicate<T> (such as `and`, `or`).
      */
     private final Predicate<Typo3Entry> bibFilter =
-            Filters.SHOULD_BE_PUT_ON_WEBSITE//.and(Filters.keyIsOneOf("DGT:EMSE21"));
+            Filters.SHOULD_BE_PUT_ON_WEBSITE.and(ignores.negate())
 //            Filters.THESIS_SUPERVISED_BY_SOFTVARE.or(Filters.WITH_PAUL_AT_ICG) // upload to "Abschlussarbeiten"
 //            Filters.THESIS_AUTHORED_BY_SOFTVARE // upload to "Publikationen"
 //            Filters.IS_SOFTVARE_WEBSITE_PAPER.and(Filters.WITH_THOMAS_BEFORE_ULM)
@@ -84,8 +105,24 @@ public class ExportTypo3Bibtex extends Export {
 //			  Filters.BELONGS_TO_SOFTVARE
 //            Filters.BELONGS_TO_OBDDIMAL
 //			  Filters.keyIsOneOf("TCA:SPLC21")
+        // This is the filter used for the OPARU export (see: https://spgit.informatik.uni-ulm.de/softvare-group/org/-/issues/13).
+        //IS_SOFTVARE_PUBLICATION
+        //  .and(t -> t.year == 2024) // choose year here
+        //  .and(IS_TECHREPORT.negate())
             ;
 
+    /**
+     * The following publications are excluded during the export,
+     * so they won't appear on our websites.
+     */
+    public final static Predicate<Typo3Entry> ignores = keyIsOneOf(
+            "splc24benchmark:replication",
+            "splc24benchmark:repository",
+            "HSO+:VaMoS24-Artifact",
+            "BKH+:VaMoS24-Artifact",
+            "BTS+:ESECFSE22:Artifact"
+    );
+    
     /**
      * Select the modifiers you want to apply to each entry after filtering.
      * Each modifier is a function taking a Typo3Entry and returning the modified Typo3Entry.
@@ -102,6 +139,7 @@ public class ExportTypo3Bibtex extends Export {
             , when(IS_MASTERSTHESIS, setEntryType(TYPE_THESIS)) // Need for proper display on website
 
             // Custom Links to Preprints
+            , whenKeyIs("BSM+:OOPSLA24", softVarEURLFile("2024-OOPSLA-Bittner"))
             , whenKeyIs("KKS+:SE23", softVarEURLFile("2023-SE-Kuiter-Tseitin"))
             , whenKeyIs("KKK+:SE23", softVarEURLFile("2023-SE-Kuiter-variED"))
             , whenKeyIs("AMK+:GPCE16", softVarEURLFile("2016-GPCE-Al-Hajjaji-Demo"))
@@ -123,8 +161,13 @@ public class ExportTypo3Bibtex extends Export {
 
             // Other custom solutions
             , whenKeyIs("Young21", KEEP_URL_IF_PRESENT)
+            // The number of this entry is OOPSLA2, the only value in this entry that hints at this entry being published at OOPSLA
+            // The number is dropped for Typo3 so we append it to the journal name.
+            , whenKeyIs("BSM+:OOPSLA24", sideffect(t -> t.journal += " " + t.source.entry.getField(BibTeXEntry.KEY_NUMBER).toUserString()))
 
             // Resolving duplicates
+            , whenKeyIs("PKTS:TR24subsumedbyPKTS:SPLC24", MARK_AS_TECHREPORT)
+            , whenKeyIs("SKH+:SPLC24", MARK_AS_JOURNAL_FIRST)
             , whenKeyIs("RBP+:TR22subsumedbyRBP+:LMCS23", MARK_AS_TECHREPORT)
             , whenKeyIs("SHN+:SE24", MARK_AS_SE_GI_PAPER)
             , whenKeyIs("KKS+:SE23", MARK_AS_SE_GI_PAPER)
@@ -160,20 +203,23 @@ public class ExportTypo3Bibtex extends Export {
 
     @Override
     public void writeDocument() {
-        System.err.println(
-                "FIXME: SHN+:SE24 is currently marked as SE paper by a custom rule. " +
-                "It might get renamed in BibTags in the future. " +
-                "In case this happens, the rule might have be removed."
-        );
-        // Parse the variables defined in MYabrv.bib
-        final Map<String, String> variables = readVariablesFromBibtexFile(new File(BibtexViewer.BIBTEX_DIR, VariablesFile));
+        System.out.println("=== Parsing BibTeX entries to Typo3 entries ===");
+        System.out.println("  BibTags files have been read from from " + BibtexViewer.BIBTEX_DIR);
 
+        final File variablesFileLocation = new File(BibtexViewer.BIBTEX_DIR, VariablesFile);
+        System.out.println("  Parse variables from " + variablesFileLocation);
+        // Parse the variables defined in MYabrv.bib
+        final Map<String, String> variables = readVariablesFromBibtexFile(variablesFileLocation);
+
+        System.out.println("  Converting entries...");
         // Transform all Bibtex-Entries to Typo3Entries, filter them and apply all modifiers.
         final List<Typo3Entry> typo3Entries = entries.values().stream()
                 .map(b -> new Typo3Entry(b, variables))
                 .filter(bibFilter)
                 .map(ExportTypo3Bibtex::applyModifiers)
                 .collect(Collectors.toList());
+
+        System.out.println("=== DONE ===");
 
         final StringBuilder uploadInstructions = new StringBuilder(System.lineSeparator());
         uploadInstructions.append("To correctly import your entries to Typo3, you should upload:");

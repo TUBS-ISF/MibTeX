@@ -262,11 +262,11 @@ public class BibtexEntry {
 			if (venue.equalsIgnoreCase("(incollection)"))
 				return;
 			try {
-				venue = entry.getField(BibTeXEntry.KEY_BOOKTITLE).toUserString();
+				venue = entry.getField(BibTeXEntry.KEY_BOOKTITLE).toUserString().toUpperCase();
 			} catch (Exception e) {
 			}
 			try {
-				venue = entry.getField(BibTeXEntry.KEY_JOURNAL).toUserString();
+				venue = entry.getField(BibTeXEntry.KEY_JOURNAL).toUserString().toUpperCase();
 			} catch (Exception e) {
 			}
 		}

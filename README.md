@@ -11,9 +11,8 @@ Besides the export to HTML, there is an export to CSV, which is useful to embed 
 
 MibTeX is implemented in Java and comes as an Eclipse/Maven project.
 Install and run it with `./MibTeX.sh` (Maven required).
-As MibTeX requires numerous paths on your local system there are two ways to specify those settings: as command-line parameters or by a configuration file. Of those two options, we recommend the configuration file.
+As MibTeX requires numerous paths on your local system there are two ways to specify those settings by a configuration file.
 
-### Option 1: Configuration File (recommended)
 Create a configuration file (by default, `options.ini` in the root directory) specifying the required paths:
 ```
 [options]
@@ -22,37 +21,52 @@ main-dir=[absolute path to your output folder]
 out-dir-rel=[relative path to the created html page]
 pdf-dir=[absolute path to the PDFs for your BibTeX entries]
 pdf-dir-rel=[relative path to the PDFs for your BibTeX entries]
+comment-dir=[path do BibTags-Comments-Library]
+comment-dir-rel=[relative path do BibTags-Comments-Library]
+preprints-dir=[path to SoftVarE preprints directory]
 tags=[list of BibTeX tags you want to use on the website]
-clean=[value true if you want to have the output directory cleaned before export]
-citationService=[value true if you want to start the bot that reads from Google scholar]
+clean=[optional value: true if you want to have the output directory cleaned before export]
+citation-service=[optional value: true if you want to start the bot that reads from Google scholar]
 citation-dir=[absolute path to the file that contains the file with the Google scholar citations]
-out-format=[HTML_NEW for output as HTML page, see code for more options]
+out-format=[The type of export you want to run, such as HTML_NEW for output as HTML page; see code for more options]
 ```
 
-Here is an `example.ini` that contains real paths:
+As an example, this is Thomas' ini file for generating the BibTags website:
 ```
 [options]
-bibtex-dir=C:\\Users\\tthuem\\git\\BibTags\\
-main-dir=C:\\Users\\tthuem\\git\\Literature\\Library\\
-out-dir-rel=
-pdf-dir=
-pdf-dir-rel=
-tags=tt-tags,tc-tags,sampling-tags,sampling2-tags,sampling3-tags,sampling4-tags,sampling5-tags,sampling6-tags,sampling7-tags,sampling8-tags,sampling9-tags,sampling10-tags
-clean=false
-citationService=false
-citation-dir=C:\\Users\\tthuem\\git\\BibTags\\classification\\
+bibtex-dir=/Users/tthuem/git/team/BibTags/literature/
+main-dir=/Users/tthuem/git/team/
+out-dir-rel=Library/
+pdf-dir=BibTags-Library/
+pdf-dir-rel=../BibTags-Library/
+comment-dir=BibTags-Comments-Library/
+comment-dir-rel=../BibTags-Comments-Library/
+preprints-dir=../Papers/
+tags=tttags,tctags,samplingtags,sampling2tags,sampling3tags,sampling4tags,sampling5tags,sampling6tags,sampling7tags,sampling8tags,sampling9tags,sampling10tags
+citation-dir=/Users/tthuem/git/team/BibTags-Old/classification/
 out-format=HTML_NEW
 ```
 
-Run MibTeX like this:
-`java.exe -cp bin;lib/* "de.mibtex.BibtexViewer" "C:\\Users\\tthuem\\Tools\\example.ini"`
+## Running MibTeX (from Command Line)
 
-### Option 2: Command-Line Parameters
-0. Directory of your BibTeX repository ("D:/Literatur/BibTags/")
-1. The output directory ("D:/Literatur/")
-2. Relative path inside the output directory where the page should be generated ("")
-3. Relative directory to pdfs ("PDF/")?
-4. Relative path inside the output directory where your pdfs are stored ("PDF/")
-5. List of tags ("tt-tags" or "keywords" referring to the entry that contains your tags)
-6. Target format: If you just want to generate the html page use "HTML_NEW".
-7. "true" if the output directory should be cleaned before build, "false" else
+### Running MibTeX Manually
+
+1. Navigate with the Terminal to the `MibTeX` directory within this Git repository. You are at the right location when `ls` lists a `pom.xml` file.
+2. You can build with Maven. The following Maven command will build a Jar file for you to run:
+    ```shell
+    mvn package
+    ```
+3. The generated Jar file is located in the `target` directory, which is Maven's build directory. You can run the file directly or copy it to another place beforehand. The first argument to MibTeX should be a path to your ini file. By default, we group those files in the `config` directory at the root of this repository.
+    ```shell
+	java -jar target/MibTeX-1.0-SNAPSHOT.jar ../config/typo3.ini
+    ```
+
+### Running MibTeX via Make
+
+All the above commands are documented in our `Makefile` which resides right next to the `pom.xml` for Maven.
+* To clean the build files run: `make clean`
+* To build run: `make build`
+
+The makefile contains a few default targets to run MibTeX. These goals assume that a respective ini file exists in the `config` directory. If you do not have a config there, oryour config is in another directory, consider running MibTeX manually (see above) or to adapt the Makefile (but do not commit those changes!).
+* To run the HTML export: `make run-html-export`.
+* To run the Typo3 export: `make run-typo3-export`.

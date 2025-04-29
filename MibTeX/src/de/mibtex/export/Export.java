@@ -53,11 +53,9 @@ public abstract class Export {
             };
             BibTeXDatabase database = parser.parse(reader);
             extractEntries(database);
-        } catch (FileNotFoundException e) {
-            System.out.println("BibTeX-File not found under " + path + file);
-            System.exit(0);
         } catch (IOException e) {
-            System.out.println("BibTeXParser has an IOExeption");
+            System.err.println("BibTeXParser has an IOExeption");
+            System.err.println(e);
             System.exit(0);
         } catch (ParseException e) {
             System.out.println("BibTeX-File cannot be parsed");
@@ -141,10 +139,11 @@ public abstract class Export {
     private static void readVenues() {
         venues = new ArrayList<String>();
         for (BibtexEntry entry : entries.values()) {
+        	// TODO better solution would be to do these replacements with MYshort
         	if ("GPCE13".equals(entry.venue))
         		entry.venue = "GPCE";
-        	if ("VaMoS20".equals(entry.venue))
-        		entry.venue = "VaMoS";
+        	if ("VAMOS20".equals(entry.venue))
+        		entry.venue = "VAMOS";
             if (!venues.contains(entry.venue))
                 venues.add(entry.venue);
         }
@@ -163,25 +162,16 @@ public abstract class Export {
         Collections.sort(tags);
     }
 
-    public static void printMissingPDFs() {
-        for (BibtexEntry entry : entries.values()) {
-            File file = entry.getPDFPath();
-            if (!file.exists())
-                System.out.println(file.getName());
-        }
-    }
-
-    public static void renameFiles() {
-        List<File> available = new ArrayList<File>();
+    public static void renameFiles(boolean comments) {
+    	File folder = new File(comments ? BibtexViewer.COMMENTS_DIR : BibtexViewer.PDF_DIR);
+    	if (!folder.exists())
+    		return;
+    	System.out.println("Checking the following folder for PDFs: " + folder.getAbsolutePath());
+    	
         List<BibtexEntry> missing = new ArrayList<BibtexEntry>();
-        try {
-            for (File file : new File(BibtexViewer.PDF_DIR).listFiles())
-                available.add(file);
-        } catch (NullPointerException e) {
-            System.out.println("No PDFs in " + BibtexViewer.PDF_DIR);
-        }
+        List<File> available = findAvailablePDFs(folder);
         for (BibtexEntry entry : entries.values()) {
-            File file = entry.getPDFPath();
+            File file = comments ? entry.getCommentsPath() : entry.getPDFPath();
             if (file.exists()) {
                 if (!available.remove(file))
                     System.err.println("File comparison failed: " + file);
@@ -193,20 +183,24 @@ public abstract class Export {
         System.out.println("Correct = " + (entries.size() - missing.size())
                 + ", Available = " + available.size() + ", Missing = "
                 + missing.size());
-        System.out.println();
+        for (File file : available) {
+            System.out.println("Available: " + file.getName());
+        }
         Scanner answer = new Scanner(System.in);
         while (!available.isEmpty()) {
             int minDistance = Integer.MAX_VALUE;
             BibtexEntry missingEntry = null;
             File availableFile = null;
+        	File newName = null;
             for (BibtexEntry entry : missing) {
                 for (File file : available) {
-                    int distance = Levenshtein.getDistance(file.getName(),
-                            entry.getPDFPath().getName());
+                	File currentName = comments ? entry.getCommentsPath() : entry.getPDFPath();
+                    int distance = Levenshtein.getDistance(file.getName(), currentName.getName());
                     if (distance < minDistance) {
                         minDistance = distance;
                         missingEntry = entry;
                         availableFile = file;
+                        newName = currentName;
                     }
                 }
             }
@@ -214,33 +208,40 @@ public abstract class Export {
             if (minDistance > availableFile.getName().length() * 0.7)
                 break;
             if (availableFile != null) {
+                System.out.println();
                 System.out.println("Available: " + availableFile.getName());
                 System.out.println("Missing: "
-                        + missingEntry.getPDFPath().getName());
+                        + newName.getName());
                 System.out.println("Key: "
                         + missingEntry.entry.getKey().getValue());
                 System.out.println("Distance: " + minDistance);
                 System.out.println("Remaining: " + missing.size());
                 if (answer.next().equals("y")) {
-                    if (availableFile.renameTo(missingEntry.getPDFPath()))
+                    if (availableFile.renameTo(newName))
                         available.remove(availableFile);
                     else
                         System.err.println("Renaming from \""
                                 + availableFile.getAbsolutePath() + "\" to \""
-                                + missingEntry.getPDFPath()
+                                + newName
                                 + "\" did not succeed!");
                 }
                 missing.remove(missingEntry);
             }
         }
         answer.close();
-        System.out.println();
-        for (File file : available) {
-            if (!file.getName().startsWith("0"))
-                file.renameTo(new File(file.getParentFile(), "0"
-                        + file.getName()));
-            System.out.println("Available: " + file.getName());
+    }
+
+    public static List<File> findAvailablePDFs(File directory) {
+    	List<File> pdfs = new ArrayList<File>();
+        for (File file : directory.listFiles()) {
+            if (file.isDirectory()) {
+                pdfs.addAll(findAvailablePDFs(file));
+            }
+            else if (file.getName().endsWith(".pdf")) {
+                pdfs.add(file);
+            }
         }
+        return pdfs;
     }
 
     public static void cleanOutputFolder() {
