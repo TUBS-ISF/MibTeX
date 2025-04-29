@@ -11,9 +11,8 @@ Besides the export to HTML, there is an export to CSV, which is useful to embed 
 
 MibTeX is implemented in Java and comes as an Eclipse/Maven project.
 Install and run it with `./MibTeX.sh` (Maven required).
-As MibTeX requires numerous paths on your local system there are two ways to specify those settings: as command-line parameters or by a configuration file. Of those two options, we recommend the configuration file.
+As MibTeX requires numerous paths on your local system there are two ways to specify those settings by a configuration file.
 
-### Option 1: Configuration File (recommended)
 Create a configuration file (by default, `options.ini` in the root directory) specifying the required paths:
 ```
 [options]
@@ -44,5 +43,23 @@ citation-dir=C:\\Users\\tthuem\\git\\BibTags\\classification\\
 out-format=HTML_NEW
 ```
 
-Run MibTeX like this:
-`java.exe -cp bin;lib/* "de.mibtex.BibtexViewer" "C:\\Users\\tthuem\\Tools\\example.ini"`
+## Running MibTeX (from Command Line)
+
+### Running MibTeX Manually
+
+1. Navigate with the Terminal to the `MibTeX` directory within this Git repository. You are at the right location when `ls` lists a `pom.xml` file.
+2. You can build with Maven. The following Maven command will build a Jar file for you to run:
+    ```shell
+    mvn package
+    ```
+3. The generated Jar file is located in the `target` directory, which is Maven's build directory. You can run the file directly or copy it to another place beforehand. The first argument to MibTeX should be a path to your ini file. By default, we group those files in the `config` directory at the root of this repository.
+    ```shell
+	java -jar target/MibTeX-1.0-SNAPSHOT.jar ../config/typo3.ini
+    ```
+
+### Running MibTeX via Make
+
+All the above commands are documented in our `Makefile` which resides right next to the `pom.xml` for Maven.
+* To build run: `make build`
+* To clean the build files run: `make clean`
+* To run the Typo3 export: `make run-typo3-export`. This will fail in case you do not have a respective config file in `config/typo3.ini`. If your config is another directory, run MibTeX manually with it (see above) or adapt the Makefile (but do not commit those changes!).
