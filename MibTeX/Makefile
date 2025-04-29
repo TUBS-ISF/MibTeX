@@ -2,6 +2,9 @@
 version := 1.0
 jar := target/MibTeX-$(version)-SNAPSHOT.jar
 
+clean:
+	mvn clean
+
 build:
 	mvn package
 
