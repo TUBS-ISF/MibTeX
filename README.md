@@ -31,18 +31,19 @@ citation-dir=[absolute path to the file that contains the file with the Google s
 out-format=[The type of export you want to run, such as HTML_NEW for output as HTML page; see code for more options]
 ```
 
-Here is an `example.ini` that contains real paths:
+As an example, this is Thomas' ini file for generating the BibTags website:
 ```
 [options]
-bibtex-dir=C:\\Users\\tthuem\\git\\BibTags\\
-main-dir=C:\\Users\\tthuem\\git\\Literature\\Library\\
-out-dir-rel=
-pdf-dir=
-pdf-dir-rel=
-tags=tt-tags,tc-tags,sampling-tags,sampling2-tags,sampling3-tags,sampling4-tags,sampling5-tags,sampling6-tags,sampling7-tags,sampling8-tags,sampling9-tags,sampling10-tags
-clean=false
-citationService=false
-citation-dir=C:\\Users\\tthuem\\git\\BibTags\\classification\\
+bibtex-dir=/Users/tthuem/git/team/BibTags/literature/
+main-dir=/Users/tthuem/git/team/
+out-dir-rel=Library/
+pdf-dir=BibTags-Library/
+pdf-dir-rel=../BibTags-Library/
+comment-dir=BibTags-Comments-Library/
+comment-dir-rel=../BibTags-Comments-Library/
+preprints-dir=../Papers/
+tags=tttags,tctags,samplingtags,sampling2tags,sampling3tags,sampling4tags,sampling5tags,sampling6tags,sampling7tags,sampling8tags,sampling9tags,sampling10tags
+citation-dir=/Users/tthuem/git/team/BibTags-Old/classification/
 out-format=HTML_NEW
 ```
 
