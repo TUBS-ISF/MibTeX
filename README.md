@@ -21,11 +21,14 @@ main-dir=[absolute path to your output folder]
 out-dir-rel=[relative path to the created html page]
 pdf-dir=[absolute path to the PDFs for your BibTeX entries]
 pdf-dir-rel=[relative path to the PDFs for your BibTeX entries]
+comment-dir=[path do BibTags-Comments-Library]
+comment-dir-rel=[relative path do BibTags-Comments-Library]
+preprints-dir=[path to SoftVarE preprints directory]
 tags=[list of BibTeX tags you want to use on the website]
-clean=[value true if you want to have the output directory cleaned before export]
-citationService=[value true if you want to start the bot that reads from Google scholar]
+clean=[optional value: true if you want to have the output directory cleaned before export]
+citation-service=[optional value: true if you want to start the bot that reads from Google scholar]
 citation-dir=[absolute path to the file that contains the file with the Google scholar citations]
-out-format=[HTML_NEW for output as HTML page, see code for more options]
+out-format=[The type of export you want to run, such as HTML_NEW for output as HTML page; see code for more options]
 ```
 
 Here is an `example.ini` that contains real paths:
