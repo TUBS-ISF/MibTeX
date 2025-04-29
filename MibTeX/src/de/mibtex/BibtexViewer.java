@@ -57,66 +57,64 @@ public class BibtexViewer {
      * @param args array containing path to ini file
      */
     public static void main(String[] args) {
-        if (args.length <= 1) {
-            String configurationFile;
-            if (args.length == 0)
-                configurationFile = "options.ini";
-            else {
-                configurationFile = args[0];
-            }
-            File iniFile = new File(configurationFile);
-            if (iniFile.exists()) {
-                Ini ini = null;
-                if (System.getProperty("os.name").contains("Windows")) {
-                    try {
-                        ini = new Wini(iniFile);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    try {
-                        ini = new Ini(iniFile);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                if (ini != null) {
-                    BIBTEX_DIR = ini.get("options", "bibtex-dir");
-                    MAIN_DIR = ini.get("options", "main-dir");
-                    OUTPUT_DIR = MAIN_DIR + ini.get("options", "out-dir-rel");
-                    PDF_DIR = MAIN_DIR + ini.get("options", "pdf-dir");
-                    PDF_DIR_REL = ini.get("options", "pdf-dir-rel");
-                    COMMENTS_DIR = MAIN_DIR + ini.get("options", "comment-dir");
-                    PREPRINTS_DIR = ini.get("options", "preprints-dir");
-                    COMMENTS_DIR_REL = ini.get("options", "comment-dir-rel");
-                    try {
-                    	String[] tagArray = ini.get("options", "tags").split(",");
-                    	TAGS.addAll(Arrays.asList(tagArray));
-                    } catch (Exception e) {}
-                    try {
-	                    String[] filterTagArray = ini.get("options", "filter-tags").split(",");
-	                    FILTERTAGS.addAll(Arrays.asList(filterTagArray));
-                    } catch (Exception e) {}
-                    try {
-                    	cleanOutputDir = ini.get("options", "clean", Boolean.class);
-                    } catch (Exception e) {}
-                    try {
-                    	citationServiceActive = ini.get("options", "citation-service", Boolean.class);
-                    } catch (Exception e) {}
-                    String citationDir = ini.get("options", "citation-dir");
-                    if (citationDir == null || citationDir.isEmpty()) {
-                        CITATION_DIR = BIBTEX_DIR;
-                    } else {
-                        CITATION_DIR = citationDir;
-                    }
-                    format = ini.get("options", "out-format");
-                } else {
-                    System.out.println("Ini file reader is null!");
-                    System.exit(0);
+        String configurationFile;
+        if (args.length == 0)
+            configurationFile = "options.ini";
+        else {
+            configurationFile = args[0];
+        }
+        File iniFile = new File(configurationFile);
+        if (iniFile.exists()) {
+            Ini ini = null;
+            if (System.getProperty("os.name").contains("Windows")) {
+                try {
+                    ini = new Wini(iniFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             } else {
-                System.out.println("Options file not found under: " + iniFile.getName());
+                try {
+                    ini = new Ini(iniFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+            if (ini != null) {
+                BIBTEX_DIR = ini.get("options", "bibtex-dir");
+                MAIN_DIR = ini.get("options", "main-dir");
+                OUTPUT_DIR = MAIN_DIR + ini.get("options", "out-dir-rel");
+                PDF_DIR = MAIN_DIR + ini.get("options", "pdf-dir");
+                PDF_DIR_REL = ini.get("options", "pdf-dir-rel");
+                COMMENTS_DIR = MAIN_DIR + ini.get("options", "comment-dir");
+                PREPRINTS_DIR = ini.get("options", "preprints-dir");
+                COMMENTS_DIR_REL = ini.get("options", "comment-dir-rel");
+                try {
+                	String[] tagArray = ini.get("options", "tags").split(",");
+                	TAGS.addAll(Arrays.asList(tagArray));
+                } catch (Exception e) {}
+                try {
+	                String[] filterTagArray = ini.get("options", "filter-tags").split(",");
+	                FILTERTAGS.addAll(Arrays.asList(filterTagArray));
+                } catch (Exception e) {}
+                try {
+                	cleanOutputDir = ini.get("options", "clean", Boolean.class);
+                } catch (Exception e) {}
+                try {
+                	citationServiceActive = ini.get("options", "citation-service", Boolean.class);
+                } catch (Exception e) {}
+                String citationDir = ini.get("options", "citation-dir");
+                if (citationDir == null || citationDir.isEmpty()) {
+                    CITATION_DIR = BIBTEX_DIR;
+                } else {
+                    CITATION_DIR = citationDir;
+                }
+                format = ini.get("options", "out-format");
+            } else {
+                System.out.println("Ini file reader is null!");
+                System.exit(0);
+            }
+        } else {
+            System.out.println("Options file not found under: " + iniFile.getName());
         }
 
         try {
