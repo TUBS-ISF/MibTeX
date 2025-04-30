@@ -170,8 +170,8 @@ public class BibtexViewer {
             Export.cleanOutputFolder();
         }
         exporter.writeDocument();
-        Export.renameFiles(false);
-        Export.renameFiles(true);
+//        Export.renameFiles(false);
+//        Export.renameFiles(true);
         if (citationServiceActive) {
             CitationService.main(new String[] {BibtexViewer.CITATION_DIR});
         }
