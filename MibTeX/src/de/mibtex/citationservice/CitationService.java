@@ -9,7 +9,7 @@ package de.mibtex.citationservice;
 import java.io.File;
 import java.io.IOException;
 
-import org.ini4j.Ini;
+import de.mibtex.Ini;
 
 /**
  * A class to export the citations from scholar for each BibTeX entry
@@ -33,14 +33,14 @@ public class CitationService {
 		if (iniFile.exists()) {
 			Ini ini = null;
 			try {
-				ini = new Ini(iniFile);
+				ini = Ini.fromFile(iniFile);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
             if (ini != null) {
-            	CITATION_DIR = ini.get("options", "citation-dir");
+            	CITATION_DIR = ini.get("citation-dir");
                 if (CITATION_DIR == null || CITATION_DIR.isEmpty()) {
-                    CITATION_DIR = ini.get("options", "bibtex-dir");
+                    CITATION_DIR = ini.get("bibtex-dir");
                 }
             }
 		} else {
