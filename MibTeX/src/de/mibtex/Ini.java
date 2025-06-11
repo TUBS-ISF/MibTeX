@@ -1,6 +1,7 @@
 package de.mibtex;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Files;
@@ -46,6 +47,10 @@ public class Ini {
             final Stream<String> lines = b.lines();
             return fromLineStream(lines);
         }
+    }
+
+    public static Ini fromFile(File path) throws IOException {
+        return fromFile(path.toPath());
     }
 
     public static boolean parseBool(String val) {
