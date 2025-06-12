@@ -209,9 +209,8 @@ public abstract class Export {
                 break;
             if (availableFile != null) {
                 System.out.println();
-                System.out.println("Available: " + availableFile.getName());
-                System.out.println("Missing: "
-                        + newName.getName());
+                System.out.println("Available: " + availableFile.getPath());
+                System.out.println("Missing: " + newName.getPath());
                 System.out.println("Key: "
                         + missingEntry.entry.getKey().getValue());
                 System.out.println("Distance: " + minDistance);
