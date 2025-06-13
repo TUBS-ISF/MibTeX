@@ -24,7 +24,7 @@ public class ScholarCitations {
 
 	private final static String SCHOLAR_URL = "https://scholar.google.com/scholar?hl=en&q=";
 	private static Pattern entryPattern = Pattern.compile(
-			"<div class=\\\"gs_r gs_or gs_scl\\\".*?>(.*?)<\\/svg><\\/a><\\/div><\\/div><\\/div>",
+			"<div class=\\\"gs_r gs_or gs_scl.*?>(.*?)<\\/svg><\\/a><\\/div><\\/div><\\/div>",
 			Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
 
 	private static String regexTitle = "<h3 class=\\\"gs_rt\\\" ontouchstart=\\\"gs_evt_dsp\\(event\\)\\\">.*?<a.*?>(.*?)<\\/a><\\/h3>";
